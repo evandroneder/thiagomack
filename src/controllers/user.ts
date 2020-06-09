@@ -9,6 +9,26 @@ import { ObjectId } from "mongodb";
 
 const router = GetRouter();
 
+router.get("/sugestion", async (req: IRequest, res: IResponse) => {
+  try {
+    const session = req.session;
+    const user = await userCollection.getUser([
+      { $match: { _id: session.userId } },
+    ]);
+
+    if (!user) return res.badRequest(`Usuário não encontrado.`);
+
+    const sugestions = await userCollection.getAll([
+      { $match: { _id: { $nin: user?.following || [] } } },
+      { $sample: { size: 5 } },
+      { $limit: 5 },
+    ]);
+    res.ok(sugestions);
+  } catch (e) {
+    res.error(e);
+  }
+});
+
 router.get("/search", async (req: IRequest, res: IResponse) => {
   try {
     const name = req.query.name as any;
