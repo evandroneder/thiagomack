@@ -15,6 +15,20 @@ const { collection } = getColletion({
   db: environment.db,
 });
 
+export async function eidtPost(post: IPostPublishRequest) {
+  try {
+    await collection.updateOne(
+      { _id: new ObjectId(post._id) },
+      {
+        $set: {
+          text: post.text,
+        },
+      }
+    );
+  } catch (e) {
+    throw "Erro alterando post: " + e;
+  }
+}
 export async function remove(postId: string) {
   return await collection.deleteOne({ _id: new ObjectId(postId) });
 }

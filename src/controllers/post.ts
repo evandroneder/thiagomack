@@ -7,6 +7,36 @@ import { GetRouter } from "nd5-mongodb-server/core";
 
 const router = GetRouter();
 
+router.put("/", async (req: IRequest, res: IResponse) => {
+  try {
+    const session = req.session;
+    const post = req.body as IPostPublishRequest;
+    post.user_id = session.userId;
+
+    let result = await postCollection.getPosts({
+      userId: req.session.userId,
+      filter: [
+        {
+          $match: {
+            _id: new ObjectId(post._id),
+            user_id: session.userId,
+          },
+        },
+      ],
+    });
+
+    console.log(result, post);
+
+    if (!result) res.badRequest("post nao encontrado.");
+
+    await postCollection.eidtPost(post);
+
+    res.ok();
+  } catch (e) {
+    res.error(e);
+  }
+});
+
 router.delete("/", async (req: IRequest, res: IResponse) => {
   try {
     const id = req.query.id as any;

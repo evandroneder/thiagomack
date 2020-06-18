@@ -3,6 +3,7 @@ import { IUser } from "@interfaces/collection/user";
 import { IPostComment } from "@interfaces/collection/post";
 
 export interface IPostPublishRequest {
+  _id: ObjectId;
   user_id: ObjectId;
   text: string;
 }
